@@ -23,7 +23,7 @@ export const Footer = () => {
         <span>Verified against Allergy Guardrails</span>
       </div>
       <div>
-        <span>API Latency: <span className="font-mono bg-gray-100 px-1 py-0.5 rounded text-orange-500">{latency > 0 ? `${Math.round(latency)}ms` : '--'}</span></span>
+        <span>API Latency: <span className="font-mono bg-white shadow-sm px-2 py-1 rounded-lg text-orange-600 font-bold">{latency > 0 ? `${latency.toFixed(0)}ms` : '--'}</span></span>
       </div>
       <div>
         <span className="font-medium text-[#FCE4EC] bg-pink-500 px-2 py-0.5 rounded-full">Engine: Groq-JSON + Lyria</span>

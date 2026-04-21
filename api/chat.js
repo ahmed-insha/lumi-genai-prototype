@@ -40,12 +40,16 @@ export default async function handler(req, res) {
       response_format: { type: "json_object" }
     });
 
+    const reply = chatCompletion.choices[0]?.message?.content || "";
+    const tokenEstimate = chatCompletion.usage?.total_tokens || 0;
+
     // Check if the response contains the refusal text
-    const refusalText = "Bestie, we only do safe and high-vibe adventures here!";
     let parsedReply;
     
-    if (reply.includes("Bestie") && (reply.includes("safe") || reply.includes("high-vibe"))) {
-      parsedReply = { refusal: refusalText };
+    // Grandma Safety check keywords: "knees", "Hot Air Balloon", "skydiving" etc.
+    // Off-topic check keywords: "vibe curator", "medical", "legal", "financial"
+    if (reply.includes("Bestie") && (reply.includes("curator") || reply.includes("knees") || reply.includes("safe"))) {
+      parsedReply = { refusal: reply.replace(/[{}]|"/g, '').trim() }; // Basic cleanup if it leaked as a string
     } else {
       try {
         parsedReply = JSON.parse(reply);
@@ -58,7 +62,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ 
       reply: parsedReply,
       tokenEstimate,
-      groundingStatus: parsedReply.refusal ? "Refused (Safety)" : "Verified"
+      groundingStatus: parsedReply.refusal ? "Handled (Safety/Guardrail)" : "Verified"
     });
   } catch (error) {
     console.error("Groq API Error:", error);

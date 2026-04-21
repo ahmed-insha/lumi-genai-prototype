@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 import { domainConfig } from '../domainConfig';
+import { Home, Plane, Sparkles } from 'lucide-react';
 
 export const Sidebar = () => {
   const { sidebarContext, updateSidebarField, vibeMode, setVibeMode } = useContext(AppContext);
@@ -8,30 +9,28 @@ export const Sidebar = () => {
   return (
     <aside className="w-72 h-full overflow-y-auto custom-scrollbar p-6 flex flex-col gap-6 bg-[#E8F5E9]/90 backdrop-blur-md rounded-3xl shadow-sm border border-white/60 mr-4 shrink-0">
       <div className="flex items-center gap-3 mb-2">
-        <img src="https://microsoft.github.io/fluentui-emoji/assets/Sparkles/3D/sparkles_3d.png" 
-             alt="Vibe Voyager Icon" className="w-10 h-10 object-contain drop-shadow-sm" 
-             onError={(e) => { e.target.style.display = 'none' }} />
+        <Sparkles className="w-8 h-8 text-orange-400" />
         <h1 className="text-2xl font-bold text-gray-800">{domainConfig.APP_NAME}</h1>
       </div>
       
       {/* Mode Toggle */}
-      <div className="bg-white/50 p-2 rounded-2xl flex gap-1">
+      <div className="bg-white/50 p-2 rounded-2xl flex gap-1 shadow-inner">
         <button 
           onClick={() => setVibeMode('HOME_SANCTUARY')}
-          className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
             vibeMode === 'HOME_SANCTUARY' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700 hover:bg-white/30'
           }`}
         >
-           <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/House/3D/house_3d.png" className="w-4 h-4" alt="Home" />
+           <Home size={18} />
            Home
         </button>
         <button 
           onClick={() => setVibeMode('GLOBAL_ESCAPE')}
-          className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
             vibeMode === 'GLOBAL_ESCAPE' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700 hover:bg-white/30'
           }`}
         >
-          <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/World%20map/3D/world_map_3d.png" className="w-4 h-4" alt="Trip" />
+          <Plane size={18} />
           Trip
         </button>
       </div>
