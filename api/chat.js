@@ -55,8 +55,8 @@ export default async function handler(req, res) {
       }
     }
 
-    let status = "Verified";
-    if (parsedReply.refusal) {
+    let status = mode === 'GLOBAL_ESCAPE' ? "Voyaging..." : "Curating Home Sanctuary...";
+    if (parsedReply?.refusal) {
       if (parsedReply.refusal.includes("medical")) status = "Refused (Medical/Legal)";
       else if (parsedReply.refusal.includes("knees")) status = "Refused (Grandma Safety)";
       else if (parsedReply.refusal.includes("physics")) status = "Refused (Reality Check)";
