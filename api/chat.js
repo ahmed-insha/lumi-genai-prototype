@@ -40,29 +40,30 @@ export default async function handler(req, res) {
       response_format: { type: "json_object" }
     });
 
-    const reply = chatCompletion.choices[0]?.message?.content || "";
-    const tokenEstimate = chatCompletion.usage?.total_tokens || 0;
-
-    // Check if the response contains the refusal text
     let parsedReply;
-    
-    // Grandma Safety check keywords: "knees", "Hot Air Balloon", "skydiving" etc.
-    // Off-topic check keywords: "vibe curator", "medical", "legal", "financial"
-    if (reply.includes("Bestie") && (reply.includes("curator") || reply.includes("knees") || reply.includes("safe"))) {
-      parsedReply = { refusal: reply.replace(/[{}]|"/g, '').trim() }; // Basic cleanup if it leaked as a string
-    } else {
-      try {
-        parsedReply = JSON.parse(reply);
-      } catch(e) {
-        // Fallback for non-JSON responses
+    try {
+      parsedReply = JSON.parse(reply);
+    } catch(e) {
+      // Fallback for non-JSON responses or hard refusals
+      if (reply.includes("Bestie,") || reply.includes("thrilling") || reply.includes("off-limits")) {
+        parsedReply = { refusal: reply };
+      } else {
         parsedReply = { error: "JSON Parsing Error", raw: reply };
       }
+    }
+
+    let status = "Verified";
+    if (parsedReply.refusal) {
+      if (parsedReply.refusal.includes("medical")) status = "Refused (Medical/Legal)";
+      else if (parsedReply.refusal.includes("knees")) status = "Refused (Grandma Safety)";
+      else if (parsedReply.refusal.includes("physics")) status = "Refused (Reality Check)";
+      else status = "Refused (Allergy/Toxic)";
     }
 
     return res.status(200).json({ 
       reply: parsedReply,
       tokenEstimate,
-      groundingStatus: parsedReply.refusal ? "Handled (Safety/Guardrail)" : "Verified"
+      groundingStatus: status
     });
   } catch (error) {
     console.error("Groq API Error:", error);

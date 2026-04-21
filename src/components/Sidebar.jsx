@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 import { domainConfig } from '../domainConfig';
-import { Home, Plane, Sparkles } from 'lucide-react';
+import { Sparkles, Home, Plane } from 'lucide-react';
 
 export const Sidebar = () => {
   const { sidebarContext, updateSidebarField, vibeMode, setVibeMode } = useContext(AppContext);
@@ -9,28 +9,28 @@ export const Sidebar = () => {
   return (
     <aside className="w-72 h-full overflow-y-auto custom-scrollbar p-6 flex flex-col gap-6 bg-[#E8F5E9]/90 backdrop-blur-md rounded-3xl shadow-sm border border-white/60 mr-4 shrink-0">
       <div className="flex items-center gap-3 mb-2">
-        <Sparkles className="w-8 h-8 text-orange-400" />
+        <Sparkles className="text-pink-500 w-8 h-8" />
         <h1 className="text-2xl font-bold text-gray-800">{domainConfig.APP_NAME}</h1>
       </div>
       
       {/* Mode Toggle */}
-      <div className="bg-white/50 p-2 rounded-2xl flex gap-1 shadow-inner">
+      <div className="bg-white/50 p-2 rounded-2xl flex gap-1">
         <button 
           onClick={() => setVibeMode('HOME_SANCTUARY')}
-          className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 ${
             vibeMode === 'HOME_SANCTUARY' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700 hover:bg-white/30'
           }`}
         >
-           <Home size={18} />
+           <Home className="w-4 h-4" />
            Home
         </button>
         <button 
           onClick={() => setVibeMode('GLOBAL_ESCAPE')}
-          className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 ${
             vibeMode === 'GLOBAL_ESCAPE' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700 hover:bg-white/30'
           }`}
         >
-          <Plane size={18} />
+          <Plane className="w-4 h-4" />
           Trip
         </button>
       </div>

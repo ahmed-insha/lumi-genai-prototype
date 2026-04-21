@@ -7,6 +7,6 @@ export const logger = {
     console.log(`🛡️ Grounding Status: ${groundingStatus}`);
 
     // Dispatch event for Footer
-    window.dispatchEvent(new CustomEvent('vibe_latency', { detail: { latency, status: groundingStatus } }));
+    window.dispatchEvent(new CustomEvent('vibe_latency', { detail: { latency, status: groundingStatus, tokens: tokenEstimate } }));
   }
 };

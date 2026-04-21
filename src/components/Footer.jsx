@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
-// Basic event system for footer to listen to logger events if we wanted, 
-// but we will just pass via window for a hackathon trick.
 export const Footer = () => {
-  const [latency, setLatency] = useState(0);
+  const [metrics, setMetrics] = useState({ latency: 0, status: 'Standing By', tokens: 0 });
 
   useEffect(() => {
-    // Hackathon trick: Listen for custom event dispatched by logger
     const handleLog = (e) => {
-      if (e.detail && e.detail.latency) {
-        setLatency(e.detail.latency);
+      if (e.detail) {
+        setMetrics({
+          latency: e.detail.latency || 0,
+          status: e.detail.status || 'Verified',
+          tokens: e.detail.tokens || 0
+        });
       }
     };
     window.addEventListener('vibe_latency', handleLog);
@@ -17,16 +18,17 @@ export const Footer = () => {
   }, []);
 
   return (
-    <footer className="w-full mt-4 flex items-center justify-between text-xs text-gray-500 bg-white/50 px-6 py-3 rounded-full border border-gray-100 shadow-sm backdrop-blur-md shrink-0">
-      <div className="flex items-center gap-2">
-        <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
-        <span>Verified against Allergy Guardrails</span>
+    <footer className="w-full mt-4 flex justify-between items-center text-xs text-gray-500 bg-white/60 px-6 py-4 rounded-3xl border border-white/60 shadow-sm backdrop-blur-md shrink-0">
+      <div className="flex items-center gap-3">
+        <span className={`flex h-2 w-2 rounded-full ${metrics.status.includes('Refused') ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></span>
+        <span className="font-bold text-gray-700 tracking-wide">{metrics.status}</span>
+      </div>
+      <div className="flex gap-6 font-mono text-[11px] bg-white/50 px-4 py-2 rounded-2xl border border-white">
+        <span>⏱️ Latency: <span className="text-pink-600 font-bold">{metrics.latency > 0 ? `${Math.round(metrics.latency)}ms` : '--'}</span></span>
+        {metrics.tokens > 0 && <span>Tokens: <span className="text-blue-600 font-bold">{metrics.tokens}</span></span>}
       </div>
       <div>
-        <span>API Latency: <span className="font-mono bg-white shadow-sm px-2 py-1 rounded-lg text-orange-600 font-bold">{latency > 0 ? `${latency.toFixed(0)}ms` : '--'}</span></span>
-      </div>
-      <div>
-        <span className="font-medium text-[#FCE4EC] bg-pink-500 px-2 py-0.5 rounded-full">Engine: Groq-JSON + Lyria</span>
+        <span className="font-bold text-[#FCE4EC] bg-pink-500/90 px-3 py-1.5 rounded-full tracking-wider uppercase text-[10px]">Engine: Groq-JSON + Lyria</span>
       </div>
     </footer>
   );

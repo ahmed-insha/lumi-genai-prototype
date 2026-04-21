@@ -1,11 +1,6 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-
-const Emojis = {
-  Trash: "https://microsoft.github.io/fluentui-emoji/assets/Wastebasket/3D/wastebasket_3d.png",
-  Bot: "https://microsoft.github.io/fluentui-emoji/assets/Robot/3D/robot_3d.png",
-  User: "https://microsoft.github.io/fluentui-emoji/assets/Person/3D/person_3d.png"
-};
+import { Bot, User, Trash2 } from 'lucide-react';
 
 export const History = () => {
   const { chatHistory, clearHistory } = useContext(AppContext);
@@ -19,7 +14,7 @@ export const History = () => {
             onClick={clearHistory}
             className="flex items-center gap-2 text-sm text-red-500 font-bold hover:text-red-700 px-4 py-2 rounded-2xl bg-[#FCE4EC]/50 border border-white hover:bg-[#FCE4EC] transition-colors shadow-sm"
           >
-            <img src={Emojis.Trash} alt="Trash" className="w-4 h-4 object-contain" />
+            <Trash2 size={16} />
             Clear
           </button>
         )}
@@ -39,7 +34,7 @@ export const History = () => {
                   : 'bg-white/90 border border-white text-gray-800 rounded-bl-none shadow-sm'
               }`}>
                 <div className="flex items-center gap-2 mb-2 opacity-80 text-xs font-bold text-gray-500">
-                  {msg.role === 'user' ? <img src={Emojis.User} className="w-4 h-4" /> : <img src={Emojis.Bot} className="w-4 h-4" />}
+                  {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
                   <span>{new Date(msg.timestamp).toLocaleTimeString()}</span>
                 </div>
                 {msg.parsedData ? (

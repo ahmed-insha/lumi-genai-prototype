@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-import { MessageSquare, LayoutDashboard, History } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, History } from 'lucide-react';
 
 export const TabsNavigation = () => {
   const { activeTab, setActiveTab } = useContext(AppContext);
