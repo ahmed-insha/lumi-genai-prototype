@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     apiKey: process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY,
   });
 
-  const { messages, context, domainConfig } = req.body;
+  const { messages, context, domainConfig, mode } = req.body;
 
   try {
     // Scaffold Context string
@@ -20,10 +20,11 @@ export default async function handler(req, res) {
       }
     }
 
-    // Replace {PRIMARY_TOPIC} in system prompt
-    const systemInstruction = domainConfig.SYSTEM_PROMPT.replace('{PRIMARY_TOPIC}', domainConfig.PRIMARY_TOPIC);
+    // Replace placeholders in system prompt
+    let systemInstruction = domainConfig.SYSTEM_PROMPT
+      .replace('{PRIMARY_TOPIC}', domainConfig.PRIMARY_TOPIC)
+      .replace('{MODE}', mode || "HOME_SANCTUARY");
     
-    // Construct System Message including the RAG Scaffold context
     const fullSystemMessage = `${systemInstruction}\n\n${contextStr}`;
 
     const apiMessages = [
@@ -36,14 +37,28 @@ export default async function handler(req, res) {
       model: 'llama-3.3-70b-versatile',
       temperature: 0.7,
       max_tokens: 1024,
+      response_format: { type: "json_object" }
     });
 
-    const reply = chatCompletion.choices[0]?.message?.content || "";
-    const tokenEstimate = chatCompletion.usage?.total_tokens || 0;
+    // Check if the response contains the refusal text
+    const refusalText = "Bestie, we only do safe and high-vibe adventures here!";
+    let parsedReply;
+    
+    if (reply.includes("Bestie") && (reply.includes("safe") || reply.includes("high-vibe"))) {
+      parsedReply = { refusal: refusalText };
+    } else {
+      try {
+        parsedReply = JSON.parse(reply);
+      } catch(e) {
+        // Fallback for non-JSON responses
+        parsedReply = { error: "JSON Parsing Error", raw: reply };
+      }
+    }
 
     return res.status(200).json({ 
-      reply,
-      tokenEstimate
+      reply: parsedReply,
+      tokenEstimate,
+      groundingStatus: parsedReply.refusal ? "Refused (Safety)" : "Verified"
     });
   } catch (error) {
     console.error("Groq API Error:", error);

@@ -11,15 +11,17 @@ function MainApp() {
   const { activeTab } = useContext(AppContext);
 
   return (
-    <div className="min-h-screen p-6 max-h-screen flex flex-col box-border">
-      <div className="flex-1 flex overflow-hidden">
+    <div className="h-screen overflow-hidden p-6 flex flex-col box-border bg-buttermilk">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         <Sidebar />
-        <main className="flex-1 flex flex-col h-full max-w-5xl mx-auto w-full relative">
+        <main className="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar max-w-5xl mx-auto w-full relative px-2">
           <TabsNavigation />
           
-          {activeTab === 'Action' && <ChatInterface />}
-          {activeTab === 'Dashboard' && <Dashboard />}
-          {activeTab === 'History' && <History />}
+          <div className="flex-1 min-h-0 flex flex-col">
+            {activeTab === 'Action' && <ChatInterface />}
+            {activeTab === 'Dashboard' && <Dashboard />}
+            {activeTab === 'History' && <History />}
+          </div>
         </main>
       </div>
       <Footer />

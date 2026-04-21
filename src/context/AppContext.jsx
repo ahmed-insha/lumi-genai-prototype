@@ -4,12 +4,10 @@ import { domainConfig } from '../domainConfig';
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  // Initialize context data from localStorage or defaults
   const initializeSidebarContext = () => {
     const saved = localStorage.getItem('lumi_sidebarContext');
     if (saved) return JSON.parse(saved);
     
-    // Default context based on domainConfig
     const defaultContext = {};
     domainConfig.SIDEBAR_FIELDS.forEach(field => {
       defaultContext[field.id] = '';
@@ -25,8 +23,13 @@ export const AppProvider = ({ children }) => {
   });
 
   const [activeTab, setActiveTab] = useState('Action');
+  
+  // Vibe Voyager Mode: 'HOME_SANCTUARY' or 'GLOBAL_ESCAPE'
+  const [vibeMode, setVibeMode] = useState(() => {
+    const savedMode = localStorage.getItem('lumi_vibeMode');
+    return savedMode || 'HOME_SANCTUARY';
+  });
 
-  // Persist to localStorage whenever dependencies change
   useEffect(() => {
     localStorage.setItem('lumi_sidebarContext', JSON.stringify(sidebarContext));
   }, [sidebarContext]);
@@ -35,12 +38,16 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('lumi_chatHistory', JSON.stringify(chatHistory));
   }, [chatHistory]);
 
+  useEffect(() => {
+    localStorage.setItem('lumi_vibeMode', vibeMode);
+  }, [vibeMode]);
+
   const updateSidebarField = (id, value) => {
     setSidebarContext(prev => ({ ...prev, [id]: value }));
   };
 
-  const addChatMessage = (role, content) => {
-    setChatHistory(prev => [...prev, { role, content, timestamp: Date.now() }]);
+  const addChatMessage = (role, content, parsedData = null) => {
+    setChatHistory(prev => [...prev, { role, content, parsedData, timestamp: Date.now() }]);
   };
 
   const clearHistory = () => {
@@ -56,7 +63,9 @@ export const AppProvider = ({ children }) => {
         addChatMessage,
         clearHistory,
         activeTab,
-        setActiveTab
+        setActiveTab,
+        vibeMode,
+        setVibeMode
       }}
     >
       {children}
