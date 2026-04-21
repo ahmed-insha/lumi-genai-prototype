@@ -40,6 +40,9 @@ export default async function handler(req, res) {
       response_format: { type: "json_object" }
     });
 
+    const reply = chatCompletion.choices[0]?.message?.content || "";
+    const tokenEstimate = chatCompletion.usage?.total_tokens || 0;
+
     let parsedReply;
     try {
       parsedReply = JSON.parse(reply);
