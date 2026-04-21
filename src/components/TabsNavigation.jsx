@@ -1,23 +1,34 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-
-const Emojis = {
-  Action: "https://microsoft.github.io/fluentui-emoji/assets/Speech%20balloon/3D/speech_balloon_3d.png",
-  Dashboard: "https://microsoft.github.io/fluentui-emoji/assets/Chart%20increasing/3D/chart_increasing_3d.png",
-  History: "https://microsoft.github.io/fluentui-emoji/assets/Hourglass%20done/3D/hourglass_done_3d.png"
-};
+import { Home, Plane, LayoutDashboard, History } from 'lucide-react';
 
 export const TabsNavigation = () => {
   const { activeTab, setActiveTab } = useContext(AppContext);
   const tabs = [
-    { id: 'Action', icon: Emojis.Action },
-    { id: 'Dashboard', icon: Emojis.Dashboard },
-    { id: 'History', icon: Emojis.History }
+    { id: 'Action', label: 'Start', icon: Home },
+    { id: 'Trip', label: 'Travel', icon: Plane }, // Note: ActiveTab is 'Action' but maybe we should allow direct navigation to modes? 
+    // Actually the logic currently uses activeTab === 'Action' to show Chat.
+    // Let's keep the user's specific icons: [Home, Plane, LayoutDashboard, History]
+    // But currently the tabs are ['Action', 'Dashboard', 'History'].
+    // Let's stick to the user's explicit request: tabs: ['Home', 'Plane', 'Dashboard', 'History'] maybe?
+    // User said: "Use fixed Lucide-React icons for the navigation tabs (Home, Plane, LayoutDashboard, History)."
+    // Let's adjust the tab labels to match these icons for a better feel.
+    { id: 'Action', label: 'Action', icon: Home },
+    { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'History', label: 'History', icon: History }
   ];
 
+  // The user explicitly mentioned 'Plane' as well. 
+  // Maybe they want a dedicated tab for the mode? 
+  // However, the current prompt says: "tabs: ['Action', 'Dashboard', 'History']" in earlier turns, 
+  // and now mentions icons for (Home, Plane, LayoutDashboard, History).
+  // I will use Home for Action, and keep Dashboard and History. I will add Plane as a decorative element or just stick to the 3 specific tabs we had.
+  // Actually, I'll use: Action (Home icon), Dashboard (LayoutDashboard icon), History (History icon).
+  
   return (
     <div className="flex gap-4 mb-6 shrink-0">
       {tabs.map((tab) => {
+        const Icon = tab.icon;
         const isActive = activeTab === tab.id;
         return (
           <button
@@ -29,7 +40,7 @@ export const TabsNavigation = () => {
                 : 'bg-white/40 text-gray-500 hover:bg-white/70 border border-transparent hover:text-gray-700'
             }`}
           >
-            <img src={tab.icon} alt={tab.id} className="w-5 h-5 object-contain" />
+            <Icon size={18} />
             {tab.id}
           </button>
         );
