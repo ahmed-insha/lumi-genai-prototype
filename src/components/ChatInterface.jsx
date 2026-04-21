@@ -136,9 +136,9 @@ export const ChatInterface = () => {
 
     const imageUrl = parsed.image_prompt ? `https://image.pollinations.ai/prompt/${encodeURIComponent(parsed.image_prompt)}?width=1000&height=600&nologo=true&seed=${Math.floor(Math.random()*1000)}` : null;
 
-    const RefusalWarning = parsed.refusal_message && (
-      <div className="bg-red-50/90 text-red-700 p-4 rounded-2xl border border-red-200 font-medium text-[15px] shadow-sm mb-4">
-        ⚠️ {parsed.refusal_message}
+    const RefusalWarning = parsed.sassy_note && (
+      <div className="bg-orange-50/90 text-orange-800 p-4 rounded-2xl border border-orange-200 font-medium text-[15px] shadow-sm mb-4">
+        👵 {parsed.sassy_note}
       </div>
     );
 
@@ -157,21 +157,21 @@ export const ChatInterface = () => {
           )}
           
           <div className="grid grid-cols-1 gap-4">
-            {parsed.detailed_recipe && (
+            {parsed.recipe && (
               <div className="bg-[#E8F5E9]/60 p-6 rounded-[2rem] border border-white shadow-sm">
                 <h4 className="font-black text-[#2e7d32] uppercase tracking-widest text-xs mb-3 flex items-center gap-2">
                   <span className="w-2 h-2 bg-[#2e7d32] rounded-full"></span> Detailed Recipe
                 </h4>
-                <p className="text-[15px] text-gray-800 leading-relaxed whitespace-pre-wrap">{parsed.detailed_recipe}</p>
+                <p className="text-[15px] text-gray-800 leading-relaxed whitespace-pre-wrap">{parsed.recipe}</p>
               </div>
             )}
             
-            {parsed.specific_hobby && (
+            {parsed.hobby && (
               <div className="bg-[#FCE4EC]/60 p-6 rounded-[2rem] border border-white shadow-sm">
                 <h4 className="font-black text-[#c2185b] uppercase tracking-widest text-xs mb-3 flex items-center gap-2">
                   <span className="w-2 h-2 bg-[#c2185b] rounded-full"></span> Specific Hobby
                 </h4>
-                <p className="text-[15px] text-gray-800 leading-relaxed">{parsed.specific_hobby}</p>
+                <p className="text-[15px] text-gray-800 leading-relaxed">{parsed.hobby}</p>
               </div>
             )}
           </div>
@@ -283,7 +283,7 @@ export const ChatInterface = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8 min-h-0 bg-white/20">
-        {chatHistory.length === 0 && (
+        {chatHistory.length === 0 && !isLoading && (
           <div className="h-full flex flex-col items-center justify-center animate-in fade-in zoom-in duration-700">
             <div className="bg-white/90 p-8 rounded-[3rem] border-4 border-white shadow-2xl text-gray-800 max-w-lg">
               <div className="text-5xl mb-6">🛳️</div>

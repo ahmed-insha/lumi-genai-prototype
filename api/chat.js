@@ -52,11 +52,11 @@ export default async function handler(req, res) {
     }
 
     let status = mode === 'GLOBAL_ESCAPE' ? "Voyaging..." : "Curating Home Sanctuary...";
-    if (parsedReply?.refusal_message) {
-      if (parsedReply.refusal_message.includes("medical") || parsedReply.refusal_message.includes("advice")) status = "Refused (Medical/Legal)";
-      else if (parsedReply.refusal_message.includes("knees")) status = "Refused (Grandma Safety)";
-      else if (parsedReply.refusal_message.includes("physics")) status = "Refused (Reality Check)";
-      else status = "Refused (Allergy/Toxic)";
+    if (parsedReply?.sassy_note) {
+      if (parsedReply.sassy_note.toLowerCase().includes("late")) status = "Curated (Grandma Modified)";
+      else if (parsedReply.sassy_note.toLowerCase().includes("knees")) status = "Curated (Grandma Safety)";
+      else if (parsedReply.sassy_note.toLowerCase().includes("physics")) status = "Curated (Reality Check)";
+      else status = "Curated (Allergy Adjusted)";
     }
 
     return res.status(200).json({ 
