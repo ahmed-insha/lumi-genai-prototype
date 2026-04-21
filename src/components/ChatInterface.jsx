@@ -5,9 +5,16 @@ import { logger } from '../utils/logger';
 import { Send, Music, Calendar, Zap, Home, Plane } from 'lucide-react';
 
 const VibePlayer = ({ musicVibe }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(!!musicVibe);
   const [progress, setProgress] = useState(0);
   
+  useEffect(() => {
+    if (musicVibe && !isPlaying && progress === 0) {
+       setIsPlaying(true);
+       logger.logApiCall(performance.now(), 0, "Lyria 3 (Simulated)", "Music Verified & Auto-Started");
+    }
+  }, [musicVibe]);
+
   useEffect(() => {
     if (isPlaying) {
       const interval = setInterval(() => {
@@ -113,12 +120,9 @@ export const ChatInterface = () => {
       logger.logApiCall(startTime, data.tokenEstimate || 0, '/api/chat', data.groundingStatus || "Verified");
       
       const parsed = data.reply;
+      // We no longer block parsing if a refusal_message is present, since we return full objects now.
+      addChatMessage('assistant', "", parsed);
       
-      if (parsed.refusal) {
-        addChatMessage('assistant', parsed.refusal);
-      } else {
-        addChatMessage('assistant', "", parsed);
-      }
     } catch (error) {
       console.error(error);
       addChatMessage('assistant', 'Bestie, I ran into an error connecting to my brain. Try again?');
@@ -132,10 +136,18 @@ export const ChatInterface = () => {
 
     const imageUrl = parsed.image_prompt ? `https://image.pollinations.ai/prompt/${encodeURIComponent(parsed.image_prompt)}?width=1000&height=600&nologo=true&seed=${Math.floor(Math.random()*1000)}` : null;
 
+    const RefusalWarning = parsed.refusal_message && (
+      <div className="bg-red-50/90 text-red-700 p-4 rounded-2xl border border-red-200 font-medium text-[15px] shadow-sm mb-4">
+        ⚠️ {parsed.refusal_message}
+      </div>
+    );
+
     if (vibeMode === 'HOME_SANCTUARY') {
       return (
         <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <h3 className="text-2xl font-black text-gray-800 tracking-tight leading-none">{parsed.vibe_title}</h3>
+          {RefusalWarning}
+          
+          {parsed.vibe_title && <h3 className="text-2xl font-black text-gray-800 tracking-tight leading-none">{parsed.vibe_title}</h3>}
           
           {imageUrl && (
             <div className="relative group">
@@ -145,22 +157,26 @@ export const ChatInterface = () => {
           )}
           
           <div className="grid grid-cols-1 gap-4">
-            <div className="bg-[#E8F5E9]/60 p-6 rounded-[2rem] border border-white shadow-sm">
-              <h4 className="font-black text-[#2e7d32] uppercase tracking-widest text-xs mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 bg-[#2e7d32] rounded-full"></span> Detailed Recipe
-              </h4>
-              <p className="text-[15px] text-gray-800 leading-relaxed whitespace-pre-wrap">{parsed.detailed_recipe}</p>
-            </div>
+            {parsed.detailed_recipe && (
+              <div className="bg-[#E8F5E9]/60 p-6 rounded-[2rem] border border-white shadow-sm">
+                <h4 className="font-black text-[#2e7d32] uppercase tracking-widest text-xs mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-[#2e7d32] rounded-full"></span> Detailed Recipe
+                </h4>
+                <p className="text-[15px] text-gray-800 leading-relaxed whitespace-pre-wrap">{parsed.detailed_recipe}</p>
+              </div>
+            )}
             
-            <div className="bg-[#FCE4EC]/60 p-6 rounded-[2rem] border border-white shadow-sm">
-              <h4 className="font-black text-[#c2185b] uppercase tracking-widest text-xs mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 bg-[#c2185b] rounded-full"></span> Specific Hobby
-              </h4>
-              <p className="text-[15px] text-gray-800 leading-relaxed">{parsed.specific_hobby}</p>
-            </div>
+            {parsed.specific_hobby && (
+              <div className="bg-[#FCE4EC]/60 p-6 rounded-[2rem] border border-white shadow-sm">
+                <h4 className="font-black text-[#c2185b] uppercase tracking-widest text-xs mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-[#c2185b] rounded-full"></span> Specific Hobby
+                </h4>
+                <p className="text-[15px] text-gray-800 leading-relaxed">{parsed.specific_hobby}</p>
+              </div>
+            )}
           </div>
 
-          <VibePlayer musicVibe={parsed.music_vibe} />
+          {parsed.music_vibe && <VibePlayer musicVibe={parsed.music_vibe} />}
         </div>
       );
     }
@@ -172,8 +188,10 @@ export const ChatInterface = () => {
 
       return (
         <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {RefusalWarning}
+          
           <div className="flex justify-between items-start">
-            <h3 className="text-2xl font-black text-gray-800 tracking-tight leading-none">Vibe Check: {parsed.location}</h3>
+            {parsed.location && <h3 className="text-2xl font-black text-gray-800 tracking-tight leading-none">Vibe Check: {parsed.location}</h3>}
             {parsed.calendar_link && (
               <a href={gcalUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-full text-xs font-black shadow-lg hover:bg-blue-700 transition-all hover:-translate-y-0.5 active:translate-y-0 uppercase tracking-widest shrink-0">
                 <Calendar size={14} className="text-white" /> 
@@ -189,55 +207,61 @@ export const ChatInterface = () => {
             </div>
           )}
 
-          <div className="bg-white/70 p-6 rounded-[2.5rem] border border-white shadow-sm space-y-6">
-            <h4 className="font-black text-gray-800 uppercase tracking-widest text-xs flex items-center gap-2">
-               <Plane size={16} /> Curated Itinerary
-            </h4>
-            <div className="grid gap-6">
-              {parsed.itinerary?.map((day, idx) => (
-                <div key={idx} className="relative pl-6 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-blue-100 before:rounded-full">
-                  <span className="block font-black text-blue-800 text-xs uppercase tracking-widest mb-2">{day.day}</span>
-                  <div className="grid gap-2">
-                    <div className="text-sm text-gray-700"><span className="font-black text-[10px] uppercase text-gray-400 mr-2">Morning</span> {day.morning}</div>
-                    <div className="text-sm text-gray-700"><span className="font-black text-[10px] uppercase text-gray-400 mr-2">Afternoon</span> {day.afternoon}</div>
-                    <div className="text-sm text-gray-700"><span className="font-black text-[10px] uppercase text-gray-400 mr-2">Evening</span> {day.evening}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-[#FCE4EC]/60 p-6 rounded-[2rem] border border-white shadow-sm">
-              <h4 className="font-black text-[#c2185b] uppercase tracking-widest text-[10px] mb-4">Master Packing List</h4>
-              <div className="space-y-4">
-                {parsed.packing_list && Object.entries(parsed.packing_list).map(([cat, items]) => (
-                  <div key={cat}>
-                    <div className="text-[10px] font-black text-[#c2185b]/60 uppercase mb-1">{cat}</div>
-                    <ul className="text-sm text-gray-800 space-y-1">
-                      {Array.isArray(items) && items.map((item, i) => (
-                        <li key={i} className="flex items-center gap-2">
-                          <div className="w-1 h-1 bg-[#c2185b] rounded-full"></div>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
+          {parsed.itinerary && parsed.itinerary.length > 0 && (
+            <div className="bg-white/70 p-6 rounded-[2.5rem] border border-white shadow-sm space-y-6">
+              <h4 className="font-black text-gray-800 uppercase tracking-widest text-xs flex items-center gap-2">
+                 <Plane size={16} /> Curated Itinerary
+              </h4>
+              <div className="grid gap-6">
+                {parsed.itinerary.map((day, idx) => (
+                  <div key={idx} className="relative pl-6 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-blue-100 before:rounded-full">
+                    <span className="block font-black text-blue-800 text-xs uppercase tracking-widest mb-2">{day.day}</span>
+                    <div className="grid gap-2">
+                      <div className="text-sm text-gray-700"><span className="font-black text-[10px] uppercase text-gray-400 mr-2">Morning</span> {day.morning}</div>
+                      <div className="text-sm text-gray-700"><span className="font-black text-[10px] uppercase text-gray-400 mr-2">Afternoon</span> {day.afternoon}</div>
+                      <div className="text-sm text-gray-700"><span className="font-black text-[10px] uppercase text-gray-400 mr-2">Evening</span> {day.evening}</div>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {parsed.packing_list && Object.keys(parsed.packing_list).length > 0 && (
+              <div className="bg-[#FCE4EC]/60 p-6 rounded-[2rem] border border-white shadow-sm">
+                <h4 className="font-black text-[#c2185b] uppercase tracking-widest text-[10px] mb-4">Master Packing List</h4>
+                <div className="space-y-4">
+                  {Object.entries(parsed.packing_list).map(([cat, items]) => (
+                    <div key={cat}>
+                      <div className="text-[10px] font-black text-[#c2185b]/60 uppercase mb-1">{cat}</div>
+                      <ul className="text-sm text-gray-800 space-y-1">
+                        {Array.isArray(items) && items.map((item, i) => (
+                          <li key={i} className="flex items-center gap-2">
+                            <div className="w-1 h-1 bg-[#c2185b] rounded-full"></div>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             
-            <div className="bg-[#E8F5E9]/60 p-6 rounded-[2rem] border border-white shadow-sm">
-              <h4 className="font-black text-[#2e7d32] uppercase tracking-widest text-[10px] mb-4">Outfit of the Day (OOTD)</h4>
-              <ul className="text-sm text-gray-800 space-y-3">
-                {parsed.ootd?.map((item, i) => (
-                  <li key={i} className="flex gap-3 leading-tight">
-                    <div className="text-[10px] font-black text-[#2e7d32]/50 mt-1">{i+1}</div>
-                    <span className="font-medium">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {parsed.ootd && parsed.ootd.length > 0 && (
+              <div className="bg-[#E8F5E9]/60 p-6 rounded-[2rem] border border-white shadow-sm">
+                <h4 className="font-black text-[#2e7d32] uppercase tracking-widest text-[10px] mb-4">Outfit of the Day (OOTD)</h4>
+                <ul className="text-sm text-gray-800 space-y-3">
+                  {parsed.ootd.map((item, i) => (
+                    <li key={i} className="flex gap-3 leading-tight">
+                      <div className="text-[10px] font-black text-[#2e7d32]/50 mt-1">{i+1}</div>
+                      <span className="font-medium">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -262,9 +286,9 @@ export const ChatInterface = () => {
         {chatHistory.length === 0 && (
           <div className="h-full flex flex-col items-center justify-center animate-in fade-in zoom-in duration-700">
             <div className="bg-white/90 p-8 rounded-[3rem] border-4 border-white shadow-2xl text-gray-800 max-w-lg">
-              <div className="text-5xl mb-6">✨</div>
-              <p className="text-2xl font-black mb-6 tracking-tight leading-tight">Heyy, I'm Lumi!</p>
-              <p className="text-[15px] text-gray-600 leading-relaxed font-medium">Ready to teleport? Check your sidebar to pick Home Sanctuary or Global Escape. Tell me a vibe—like <span className="font-bold text-pink-500">'Harry Potter Library'</span> or <span className="font-bold text-blue-500">'Midnight in Tokyo'</span>—and let's go!</p>
+              <div className="text-5xl mb-6">🛳️</div>
+              <p className="text-2xl font-black mb-6 tracking-tight leading-tight">Heyy, I'm Lumi, your new Grandma's Travel Bestie! ✨</p>
+              <p className="text-[15px] text-gray-600 leading-relaxed font-medium">I'm here to help you live your absolute best life now that the kids are gone. Check your sidebar to pick Home Sanctuary or Global Escape. Tell me a vibe—like <span className="font-bold text-pink-500">'Harry Potter Library'</span> or <span className="font-bold text-blue-500">'Midnight in Tokyo'</span>—and let's go!</p>
             </div>
           </div>
         )}

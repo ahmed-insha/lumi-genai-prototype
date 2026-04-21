@@ -47,19 +47,15 @@ export default async function handler(req, res) {
     try {
       parsedReply = JSON.parse(reply);
     } catch(e) {
-      // Fallback for non-JSON responses or hard refusals
-      if (reply.includes("Bestie,") || reply.includes("thrilling") || reply.includes("off-limits")) {
-        parsedReply = { refusal: reply };
-      } else {
-        parsedReply = { error: "JSON Parsing Error", raw: reply };
-      }
+      // Fallback for non-JSON responses
+      parsedReply = { error: "JSON Parsing Error", raw: reply };
     }
 
     let status = mode === 'GLOBAL_ESCAPE' ? "Voyaging..." : "Curating Home Sanctuary...";
-    if (parsedReply?.refusal) {
-      if (parsedReply.refusal.includes("medical")) status = "Refused (Medical/Legal)";
-      else if (parsedReply.refusal.includes("knees")) status = "Refused (Grandma Safety)";
-      else if (parsedReply.refusal.includes("physics")) status = "Refused (Reality Check)";
+    if (parsedReply?.refusal_message) {
+      if (parsedReply.refusal_message.includes("medical") || parsedReply.refusal_message.includes("advice")) status = "Refused (Medical/Legal)";
+      else if (parsedReply.refusal_message.includes("knees")) status = "Refused (Grandma Safety)";
+      else if (parsedReply.refusal_message.includes("physics")) status = "Refused (Reality Check)";
       else status = "Refused (Allergy/Toxic)";
     }
 
