@@ -83,12 +83,12 @@ export const ChatInterface = () => {
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   };
 
   useEffect(() => {
     scrollToBottom();
-  }, [chatHistory]);
+  }, [chatHistory, isLoading]);
 
   const handleSend = async (e) => {
     if (e) e.preventDefault();
@@ -166,12 +166,12 @@ export const ChatInterface = () => {
               </div>
             )}
             
-            {parsed.hobby && (
+            {parsed.hobby_recs && (
               <div className="bg-[#FCE4EC]/60 p-6 rounded-[2rem] border border-white shadow-sm">
                 <h4 className="font-black text-[#c2185b] uppercase tracking-widest text-xs mb-3 flex items-center gap-2">
                   <span className="w-2 h-2 bg-[#c2185b] rounded-full"></span> Specific Hobby
                 </h4>
-                <p className="text-[15px] text-gray-800 leading-relaxed">{parsed.hobby}</p>
+                <p className="text-[15px] text-gray-800 leading-relaxed">{parsed.hobby_recs}</p>
               </div>
             )}
           </div>
