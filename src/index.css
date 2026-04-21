@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-buttermilk: #FFFDF5;
+}
+
+body {
+  background-color: var(--color-buttermilk);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #1f2937;
+}
+
+@layer utilities {
+  .glass-card {
+    background-color: rgb(255 255 255 / 0.8);
+    backdrop-filter: blur(12px);
+    border-radius: 1.5rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    border: 1px solid #fff7ed; /* orange-50 equivalent */
+  }
+}
