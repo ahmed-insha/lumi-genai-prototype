@@ -25,7 +25,7 @@ export default async function handler(req, res) {
       .replace('{PRIMARY_TOPIC}', domainConfig.PRIMARY_TOPIC)
       .replace('{MODE}', mode || "HOME_SANCTUARY");
     
-    const fullSystemMessage = `${systemInstruction}\n\n${contextStr}\n\nREMINDER: You are a JSON-only API. Only output valid JSON.`;
+    const fullSystemMessage = `${systemInstruction}\n\n${contextStr}`;
 
     const apiMessages = [
       { role: 'system', content: fullSystemMessage },
@@ -39,9 +39,6 @@ export default async function handler(req, res) {
       max_tokens: 1024,
       response_format: { type: "json_object" }
     });
-
-    const reply = chatCompletion.choices[0]?.message?.content || "";
-    const tokenEstimate = chatCompletion.usage?.total_tokens || 0;
 
     // Check if the response contains the refusal text
     const refusalText = "Bestie, we only do safe and high-vibe adventures here!";
